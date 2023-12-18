@@ -71,7 +71,7 @@ This benchmark suite aims to compare the performance of Go web frameworks. It is
 * [traffic](https://github.com/pilu/traffic)
 * [treemux](https://github.com/vmihailenco/treemux)
 * [violetear](https://github.com/nbari/violetear)
-* [vulcan](https://github.com/mailgun/route)
+* [vulcan](https://github.com/vulcand/route)
 * [webgo](https://github.com/bnkamalesh/webgo)
 
 **some libs have not been maintained and the test code has removed them**

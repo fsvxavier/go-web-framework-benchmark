@@ -1,3 +1,3 @@
 #!/bin/bash
 
-web_frameworks=("default" "atreugo" "chi" "fasthttp" "fiber" "gin" "gorilla" "negroni")
+web_frameworks=("default" "default-prefork" "atreugo" "atreugo-prefork" "fasthttp-prefork" "fiber" "fiber-prefork")

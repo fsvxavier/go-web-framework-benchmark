@@ -54,6 +54,8 @@ test_all 10 5000
 echo "10 ms,"$(IFS=$','; echo "${test_result[*]}" ) >> processtime-pipeline.csv
 test_all 100 5000
 echo "100 ms,"$(IFS=$','; echo "${test_result[*]}" ) >> processtime-pipeline.csv
+test_all 200 5000
+echo "200 ms,"$(IFS=$','; echo "${test_result[*]}" ) >> processtime-pipeline.csv
 test_all 500 5000
 echo "500 ms,"$(IFS=$','; echo "${test_result[*]}" ) >> processtime-pipeline.csv
 
@@ -64,6 +66,8 @@ test_all 30 100
 echo "100,"$(IFS=$','; echo "${test_result[*]}" ) >> concurrency-pipeline.csv
 test_all 30 1000
 echo "1000,"$(IFS=$','; echo "${test_result[*]}" ) >> concurrency-pipeline.csv
+test_all 30 2000
+echo "2000,"$(IFS=$','; echo "${test_result[*]}" ) >> concurrency-pipeline.csv
 test_all 30 5000
 echo "5000,"$(IFS=$','; echo "${test_result[*]}" ) >> concurrency-pipeline.csv
 

@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"clevergo.tech/clevergo"
+	defaultforker "github.com/Ja7ad/forker"
 	"github.com/abemedia/go-don"
 	_ "github.com/abemedia/go-don/encoding/text"
 	"github.com/ant0ine/go-json-rest/rest"
@@ -59,6 +60,7 @@ import (
 	"github.com/tockins/fresh"
 	"github.com/urfave/negroni"
 	"github.com/valyala/fasthttp"
+	fasthttpprefork "github.com/valyala/fasthttp/prefork"
 	"github.com/vanng822/r2router"
 	"github.com/vardius/gorouter/v4"
 	vulcan "github.com/vulcand/route"
@@ -121,8 +123,14 @@ func main() {
 	case "default":
 		startDefaultMux()
 
+	case "default-prefork":
+		startDefaultMuxPrefork()
+
 	case "atreugo":
 		startAtreugo()
+	case "atreugo-prefork":
+		startAtreugoPrefork()
+
 	case "baa":
 		startBaa()
 	case "beego":
@@ -143,8 +151,12 @@ func main() {
 		startEcho()
 	case "echo-slim":
 		startEchoSlim()
+
 	case "fasthttp":
 		startFasthttp()
+	case "fasthttp-prefork":
+		startFasthttpPrefork()
+
 	case "fasthttprouter":
 		startFastHTTPRouter()
 	case "fasthttp/router":
@@ -153,8 +165,12 @@ func main() {
 		startFastHTTPRouting()
 	case "fastrouter":
 		startFastRouter()
+
 	case "fiber":
 		startFiber()
+	case "fiber-prefork":
+		startFiberPrefork()
+
 	case "fresh":
 		startFresh()
 	case "gear":
@@ -251,8 +267,32 @@ func helloHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func startDefaultMux() {
-	http.HandleFunc("/hello", helloHandler)
-	http.ListenAndServe(":"+strconv.Itoa(port), nil)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/hello", helloHandler)
+	http.ListenAndServe(":"+strconv.Itoa(port), mux)
+}
+
+// default mux
+func helloHandlerFork() http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if cpuBound {
+			pow(target)
+		} else {
+			if sleepTime > 0 {
+				time.Sleep(sleepTimeDuration)
+			} else {
+				runtime.Gosched()
+			}
+		}
+		w.Write(message)
+	}
+}
+
+func startDefaultMuxPrefork() {
+	srv := &http.Server{}
+	http.HandleFunc("/hello", helloHandlerFork())
+	f := defaultforker.New(srv)
+	f.ListenAndServe(":" + strconv.Itoa(port))
 }
 
 // ace
@@ -289,6 +329,18 @@ func startAtreugo() {
 	server := atreugo.New(atreugo.Config{
 		Addr:                          ":" + strconv.Itoa(port),
 		Prefork:                       false,
+		NoDefaultDate:                 true,
+		NoDefaultContentType:          true,
+		DisableHeaderNamesNormalizing: true,
+	})
+	server.GET("/hello", atreugoHandler)
+	log.Fatal(server.ListenAndServe())
+}
+
+func startAtreugoPrefork() {
+	server := atreugo.New(atreugo.Config{
+		Addr:                          ":" + strconv.Itoa(port),
+		Prefork:                       true,
 		NoDefaultDate:                 true,
 		NoDefaultContentType:          true,
 		DisableHeaderNamesNormalizing: true,
@@ -495,6 +547,35 @@ func startEchoSlim() {
 	e.Start(":" + strconv.Itoa(port))
 }
 
+func startFasthttpPrefork() {
+	s := &fasthttp.Server{
+		Handler:                       fastHTTPPreforkHandler,
+		GetOnly:                       true,
+		NoDefaultDate:                 true,
+		NoDefaultContentType:          true,
+		DisableHeaderNamesNormalizing: true,
+	}
+
+	prefork := fasthttpprefork.New(s)
+
+	log.Fatal(prefork.ListenAndServe(":" + strconv.Itoa(port)))
+}
+
+// fasthttprouter
+func fastHTTPPreforkHandler(ctx *fasthttp.RequestCtx) {
+	if cpuBound {
+		pow(target)
+	} else {
+		if sleepTime > 0 {
+			time.Sleep(sleepTimeDuration)
+		} else {
+			runtime.Gosched()
+		}
+	}
+
+	ctx.Write(message)
+}
+
 func startFasthttp() {
 	s := &fasthttp.Server{
 		Handler:                       fastHTTPHandler,
@@ -616,6 +697,19 @@ func fiberHandler(c *fiber.Ctx) error {
 func startFiber() {
 	app := fiber.New(fiber.Config{
 		Prefork:                   false,
+		CaseSensitive:             true,
+		StrictRouting:             true,
+		DisableDefaultDate:        true,
+		DisableHeaderNormalizing:  true,
+		DisableDefaultContentType: true,
+	})
+	app.Get("/hello", fiberHandler)
+	log.Fatal(app.Listen(":" + strconv.Itoa(port)))
+}
+
+func startFiberPrefork() {
+	app := fiber.New(fiber.Config{
+		Prefork:                   true,
 		CaseSensitive:             true,
 		StrictRouting:             true,
 		DisableDefaultDate:        true,
@@ -1082,16 +1176,27 @@ func startPat() {
 }
 
 // pulse
+func pulseHandler(c *pulse.Context) error {
+	if cpuBound {
+		pow(target)
+	} else {
+		if sleepTime > 0 {
+			time.Sleep(sleepTimeDuration)
+		} else {
+			runtime.Gosched()
+		}
+	}
+	c.String(messageStr)
+	return nil
+}
+
 func startPulse() {
 	app := pulse.New()
 	router := pulse.NewRouter()
 
 	app.Router = router
 
-	router.Get("/hello", func(c *pulse.Context) error {
-		c.String(string(message))
-		return nil
-	})
+	router.Get("/hello", pulseHandler)
 
 	app.Run(":" + strconv.Itoa(port))
 }

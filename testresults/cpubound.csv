@@ -1,2 +1,4 @@
-,default,atreugo,chi,fasthttp,fiber,gin,gorilla,negroni
-cpu-bound,1971.00,,2010.34,1993.51,,,,2000.86
+,default-fork,atreugo,fasthttp-prefork,fiber
+100,630.50,740.71,823.15,778.75
+1000,650.83,658.87,660.12,645.02
+5000,579.14,525.80,577.99,497.35
