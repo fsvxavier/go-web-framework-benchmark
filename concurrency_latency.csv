@@ -1,0 +1,4 @@
+,default,default-prefork,atreugo,atreugo-prefork,fasthttp-prefork,fiber,fiber-prefork
+100,31.04,30.96,30.83,30.83,30.91,30.89,30.95
+1000,32.69,31.64,31.21,32.12,32.16,31.08,32.50
+2000,46.06,39.78,40.52,37.48,37.51,41.10,37.15
