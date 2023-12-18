@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -46,7 +45,6 @@ import (
 	echo "github.com/labstack/echo/v4"
 	llog "github.com/lunny/log"
 	"github.com/lunny/tango"
-	vulcan "github.com/mailgun/route"
 	"github.com/mustafaakin/gongular"
 	"github.com/naoina/denco"
 	"github.com/nbari/violetear"
@@ -63,6 +61,7 @@ import (
 	"github.com/valyala/fasthttp"
 	"github.com/vanng822/r2router"
 	"github.com/vardius/gorouter/v4"
+	vulcan "github.com/vulcand/route"
 	tiny "go101.org/tinyrouter"
 	goji "goji.io"
 	gojipat "goji.io/pat"
@@ -70,8 +69,6 @@ import (
 	baa "gopkg.in/baa.v1"
 	lion "gopkg.in/celrenheit/lion.v1"
 	macaron "gopkg.in/macaron.v1"
-	"goyave.dev/goyave/v4"
-	"goyave.dev/goyave/v4/config"
 )
 
 var (
@@ -230,8 +227,6 @@ func main() {
 		startVulcan()
 	case "webgo":
 		startWebgo()
-	case "goyave":
-		startGoyave()
 	default:
 		fmt.Println("--------------------------------------------------------------------")
 		fmt.Println("------------- Unknown framework given!!! Check libs.sh -------------")
@@ -293,7 +288,7 @@ func atreugoHandler(ctx *atreugo.RequestCtx) error {
 func startAtreugo() {
 	server := atreugo.New(atreugo.Config{
 		Addr:                          ":" + strconv.Itoa(port),
-		Prefork:                       true,
+		Prefork:                       false,
 		NoDefaultDate:                 true,
 		NoDefaultContentType:          true,
 		DisableHeaderNamesNormalizing: true,
@@ -620,7 +615,7 @@ func fiberHandler(c *fiber.Ctx) error {
 
 func startFiber() {
 	app := fiber.New(fiber.Config{
-		Prefork:                   true,
+		Prefork:                   false,
 		CaseSensitive:             true,
 		StrictRouting:             true,
 		DisableDefaultDate:        true,
@@ -1254,57 +1249,6 @@ func startWebgo() {
 	}
 	router := webgo.NewRouter(&cfg, getWebgoRoutes()...)
 	router.Start()
-}
-
-// Goyave
-func goyaveHandler(r *goyave.Response, req *goyave.Request) {
-	if cpuBound {
-		pow(target)
-	} else {
-		if sleepTime > 0 {
-			time.Sleep(sleepTimeDuration)
-		} else {
-			runtime.Gosched()
-		}
-	}
-	r.String(http.StatusOK, "hello")
-}
-
-func getGoyaveRoutes(router *goyave.Router) {
-	router.Get("/hello", goyaveHandler)
-}
-
-func startGoyave() {
-	cfg := []byte(fmt.Sprintf(`
-	{
-		"server": {
-			"host": "0.0.0.0",
-			"port": %d,
-			"timeout": 120
-		}
-	}
-	`, port))
-
-	tmpFile, err := ioutil.TempFile("", "goyavecfg.json")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer os.Remove(tmpFile.Name())
-
-	if _, err := tmpFile.Write(cfg); err != nil {
-		log.Fatal(err)
-	}
-	if err := tmpFile.Close(); err != nil {
-		log.Fatal(err)
-	}
-
-	if err := config.LoadFrom(tmpFile.Name()); err != nil {
-		os.Exit(goyave.ExitInvalidConfig)
-	}
-
-	if err := goyave.Start(getGoyaveRoutes); err != nil {
-		os.Exit(err.(*goyave.Error).ExitCode)
-	}
 }
 
 // mock
