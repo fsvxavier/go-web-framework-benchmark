@@ -8,11 +8,11 @@ length=${#web_frameworks[@]}
 
 test_result=()
 
-cpu_cores=`cat /proc/cpuinfo|grep processor|wc -l`
-if [ $cpu_cores -eq 0 ]
-then
+# cpu_cores=`cat /proc/cpuinfo|grep processor|wc -l`
+# if [ $cpu_cores -eq 0 ]
+# then
   cpu_cores=1
-fi
+# fi
 
 test_web_framework()
 {
