@@ -1,6 +1,6 @@
 reset
 set title "Benchmark of different processing time (Latency)"
-set boxwidth 0.9
+set boxwidth 1.8
 set datafile separator ","
 set style data histogram
 set style histogram clustered gap 2
